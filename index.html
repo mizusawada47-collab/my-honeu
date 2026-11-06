@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Wifey ♡</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle, #705b48, #241c18);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Cormorant Garamond', serif;
+  color: #292018;
+}
+
+.book-container {
+  width: 100%;
+  max-width: 760px;
+  perspective: 1800px;
+}
+
+.book {
+  position: relative;
+  width: 100%;
+  min-height: 490px;
+  background: #ead9b9;
+  border-radius: 5px 14px 14px 5px;
+  box-shadow: 0 20px 60px #0009;
+  overflow: hidden;
+}
+
+.page {
+  min-height: 490px;
+  padding: 55px 45px;
+  background:
+    linear-gradient(90deg, #d2bd99 0%, #f5e8cd 5%, #f3e5c9 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform-origin: left center;
+  transition: transform .8s ease, opacity .8s ease;
+}
+
+.page.turning {
+  transform: rotateY(-180deg);
+  opacity: 0;
+}
+
+.page h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(38px, 8vw, 58px);
+  color: #593b2c;
+  margin: 0 0 25px;
+  font-weight: 400;
+}
+
+.page h2 {
+  font-size: 27px;
+  color: #593b2c;
+  margin-bottom: 20px;
+}
+
+.page p {
+  font-size: clamp(19px, 4vw, 23px);
+  line-height: 1.8;
+  color: #30251d;
+  font-weight: 600;
+  max-width: 560px;
+  margin: 8px auto;
+  text-shadow: none;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 18px;
+  right: 25px;
+  font-size: 15px;
+  color: #71543e;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 25px;
+}
+
+button {
+  background: #ead8b9;
+  border: 1px solid #c5a77d;
+  color: #39271d;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+#pageContent {
+  position: relative;
+  width: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media(max-width: 480px) {
+  .page {
+    min-height: 520px;
+    padding: 40px 24px;
+  }
+
+  .page p {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  .book {
+    min-height: 520px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="book-container">
+  <div class="book">
+    <div id="pageContent" class="page">
+      <h1>For My Wifey ♡</h1>
+      <p>A little book filled with everything I want you to know.</p>
+      <p>Happy Monthsary, my love.</p>
+      <span class="page-number">1</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prev" onclick="changePage(-1)" disabled>←</button>
+    <button id="next" onclick="changePage(1)">Turn page →</button>
+  </div>
+</div>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<script>
+const pages = [
+  {
+    title: "For My Wifey ♡",
+    text: [
+      "A little book filled with everything I want you to know.",
+      "Happy Monthsary, my love."
+    ]
+  },
+  {
+    title: "My Favorite Person",
+    text: [
+      "Out of all the people in this world, I'm still glad that I found you.",
+      "You make ordinary days feel a little more special."
+    ]
+  },
+  {
+    title: "A Little Reminder",
+    text: [
+      "Even when things get difficult, I hope you never forget how much you mean to me.",
+      "I'm grateful to have you in my life."
+    ]
+  },
+  {
+    title: "Thank You",
+    text: [
+      "Thank you for staying, for listening, and for being part of my little world.",
+      "I appreciate you more than words can explain."
+    ]
+  },
+  {
+    title: "My Promise",
+    text: [
+      "I cannot promise that every day will be perfect.",
+      "But I can promise to keep choosing you and to keep learning how to love you better."
+    ]
+  },
+  {
+    title: "Still You",
+    text: [
+      "Through all the distance and all the days in between, it's still you.",
+      "And I hope it will always be you."
+    ]
+  },
+  {
+    title: "I Love You",
+    text: [
+      "Happy Monthsary, wifey.",
+      "Here's to more memories, more laughter, and more chapters together."
+    ]
+  },
+  {
+    title: "My Wifey ♡",
+    text: [
+      "I love you, my favorite person.",
+      "Forever your Mizu. ♡"
+    ]
+  }
+];
+
+let currentPage = 0;
+let busy = false;
+let musicStarted = false;
+
+const content = document.getElementById("pageContent");
+const next = document.getElementById("next");
+const prev = document.getElementById("prev");
+const music = document.getElementById("music");
+
+function renderPage() {
+  const page = pages[currentPage];
+
+  content.innerHTML = `
+    <h1>${page.title}</h1>
+    ${page.text.map(line => `<p>${line}</p>`).join("")}
+    <span class="page-number">${currentPage + 1}</span>
+  `;
+
+  next.disabled = currentPage === pages.length - 1;
+  prev.disabled = currentPage === 0;
+}
+
+function changePage(direction) {
+  if (busy) return;
+
+  const target = currentPage + direction;
+  if (target < 0 || target >= pages.length) return;
+
+  busy = true;
+
+  if (!musicStarted) {
+    music.play().then(() => {
+      musicStarted = true;
+    }).catch(() => {});
+  }
+
+  content.classList.add("turning");
+
+  setTimeout(() => {
+    currentPage = target;
+    renderPage();
+    content.classList.remove("turning");
+    busy = false;
+  }, 400);
+}
+
+renderPage();
+</script>
+
+</body>
+</html>
